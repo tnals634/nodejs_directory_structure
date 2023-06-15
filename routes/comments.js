@@ -67,13 +67,13 @@ router.post("/:_postId/comments", async (req, res) => {
   const filterPost = posts.filter((id) => String(id._id) === _postId);
 
   //body에 입력한 content값이 없을 경우
-  if (!content.length) {
-    return res.status(400).json({ message: "댓글 내용을 입력해주세요" });
-  } else if (!user || !password || !content || !filterPost.length) {
+  if (!user || !password || !content || !filterPost.length) {
     //body에 입력을 못했거나, filterPost값이 없을 경우
     return res.status(400).json({
       message: "데이터 형식이 올바르지 않습니다.",
     });
+  } else if (!content.length) {
+    return res.status(400).json({ message: "댓글 내용을 입력해주세요" });
   }
 
   //댓글이 어느 게시글의 댓글인지 구분하기위해 postId를 따로 저장
@@ -111,14 +111,14 @@ router.put("/:_postId/comments/:_commentId", async (req, res) => {
     return res.status(404).json({
       message: "댓글 조회에 실패하였습니다.",
     });
-  } else if (!content.length) {
-    //content값을 입력하지 않았을 경우
-    return res.status(400).json({ message: "댓글 내용을 입력해주세요." });
   } else if (!password || !content) {
     //입력한 값들 중 하나라도 값이 없을 경우
     return res.status(400).json({
       message: "데이터 형식이 올바르지 않습니다.",
     });
+  } else if (!content.length) {
+    //content값을 입력하지 않았을 경우
+    return res.status(400).json({ message: "댓글 내용을 입력해주세요." });
   }
 
   // 수정한 댓글 업데이트
