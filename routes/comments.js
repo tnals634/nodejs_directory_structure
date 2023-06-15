@@ -131,7 +131,7 @@ router.put("/:_postId/comments/:_commentId", async (req, res) => {
       },
     }
   );
-  res.status(201).json({ message: "댓글을 수정하였습니다." });
+  res.json({ message: "댓글을 수정하였습니다." });
 });
 
 //댓글 삭제 API

@@ -136,7 +136,7 @@ router.put("/:_postId", async (req, res) => {
       },
     }
   );
-  res.status(201).json({ message: "게시글을 수정하였습니다." });
+  res.json({ message: "게시글을 수정하였습니다." });
 });
 
 //게시글 삭제 API
