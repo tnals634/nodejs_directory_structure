@@ -38,7 +38,7 @@ router.get("/posts", async (req, res) => {
     return postData;
   });
   console.log(data);
-  res.json({ data });
+  res.json({ data: data });
 });
 
 //게시글 상세 조회 API
