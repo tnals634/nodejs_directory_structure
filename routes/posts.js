@@ -29,13 +29,16 @@ router.get("/posts", async (req, res) => {
   );
 
   //값들 중 _id 이름만 postId로 변경
-  const data = posts.map(({ _id: postId, user, title, createdAt }) => ({
-    postId,
-    user,
-    title,
-    createdAt,
-  }));
-  res.json({ data: data });
+  const data = posts.map((post) => {
+    let postData = {};
+    postData["postId"] = String(post._id);
+    postData["user"] = post.user;
+    postData["title"] = post.title;
+    postData["createdAt"] = post.createdAt;
+    return postData;
+  });
+  console.log(data);
+  res.json({ data });
 });
 
 //게시글 상세 조회 API
