@@ -49,12 +49,15 @@ router.get("/:_postId", async (req, res) => {
   );
 
   //값들 중 _id 이름만 postId로 변경
-  const resultPosts = posts.map(({ _id: postId, user, title, createdAt }) => ({
-    postId,
-    user,
-    title,
-    createdAt,
-  }));
+  const resultPosts = posts.map(
+    ({ _id: postId, user, title, content, createdAt }) => ({
+      postId,
+      user,
+      title,
+      content,
+      createdAt,
+    })
+  );
 
   //위 params로 받은 값과 저장된 값들 중 _id값이 같은게 있는지 확인
   const [data] = resultPosts.filter((post) => String(post.postId) === _postId);
