@@ -2,7 +2,7 @@
 - ## 게시글 CRUD, 댓글 CRUD
 
 ##API 상세서
-- 내주신 API를 토대로 만들었습니다.
+- 내주신 API를 토대로 만들었습니다.<br>
 | Aa 기능 | API URL | Method | request | response | response(error) |
 | --- | --- | --- | --- | --- | --- |
 | 게시글 작성 | /posts | POST | { "user":"Develpoer",<br>"password":"1234",<br>"title":"hi",<br>"content":"content입니다."} | {"message":"게시글을 생성하였습니다."} | /400 body 또는 params를 입력받지 못한 경우<br>{"message":"데이터 형식이 올바르지 않습니다."} |
