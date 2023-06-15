@@ -21,7 +21,7 @@ const data = [
 const Comments = require("../schemas/comment.js");
 const Posts = require("../schemas/post.js");
 //댓글 목록 조회 API
-router.get("/comments/:_postId", async (req, res) => {
+router.get("/:_postId/comments", async (req, res) => {
   const { _postId } = req.params;
 
   //보여줄 값들만 1
@@ -53,7 +53,7 @@ router.get("/comments/:_postId", async (req, res) => {
 });
 
 //댓글 생성 API
-router.post("/comments/:_postId", async (req, res) => {
+router.post("/:_postId/comments", async (req, res) => {
   const { _postId } = req.params;
   const { user, password, content } = req.body;
 
@@ -63,13 +63,8 @@ router.post("/comments/:_postId", async (req, res) => {
   //보여줄 값들만 1
   const posts = await Posts.find({}, { _id: 1 });
 
-  //값들 중 _id 이름만 postId로 변경
-  const resultPosts = posts.map(({ _id: postId }) => ({
-    postId,
-  }));
-
   //입력받은 _postId값이 있는지 확인
-  const filterPost = resultPosts.filter((id) => String(id.postId) === _postId);
+  const filterPost = posts.filter((id) => String(id._id) === _postId);
 
   //body에 입력한 content값이 없을 경우
   if (!content.length) {
@@ -91,19 +86,23 @@ router.post("/comments/:_postId", async (req, res) => {
     createdAt: date,
   });
 
-  res.json({ message: "게시글을 생성하였습니다." });
+  res.json({ message: "댓글을 생성하였습니다." });
 });
 
 //댓글 수정 API
-router.put("/comments/:_commentId", async (req, res) => {
-  const { _commentId } = req.params;
+router.put("/:_postId/comments/:_commentId", async (req, res) => {
+  const { _commentId, _postId } = req.params;
   const { password, content } = req.body;
 
   //보여줄 값들만 1
-  const comments = await Comments.find({}, { _id: 1, password: 1, content: 1 });
+  const comments = await Comments.find(
+    {},
+    { _id: 1, password: 1, content: 1, postId: 1 }
+  );
 
+  const resultPosts = comments.filter((postId) => postId.postId === _postId);
   //값들 중 _id와 _commentId값 비교해서 같은값 넣어줌
-  const resultComments = comments.filter(
+  const resultComments = resultPosts.filter(
     (comment) => String(comment._id) === _commentId
   );
 
@@ -132,11 +131,11 @@ router.put("/comments/:_commentId", async (req, res) => {
       },
     }
   );
-  res.json({ message: "게시글을 수정하였습니다." });
+  res.json({ message: "댓글을 수정하였습니다." });
 });
 
 //댓글 삭제 API
-router.delete("/comments/:_commentId", async (req, res) => {
+router.delete("/:_postId/comments/:_commentId", async (req, res) => {
   const { _commentId } = req.params;
   const { password } = req.body;
 
@@ -150,7 +149,7 @@ router.delete("/comments/:_commentId", async (req, res) => {
 
   //_commentId값과 같은 값이 없을 경우
   if (!resultComments.length) {
-    return res.status(404).json({ message: "게시글 조회에 실패하였습니다." });
+    return res.status(404).json({ message: "댓글 조회에 실패하였습니다." });
   } else if (!password || password !== resultComments[0].password) {
     //입력받아야할 password값이 없거나, 저장된 password와 같지않을 경우
     return res
@@ -159,7 +158,7 @@ router.delete("/comments/:_commentId", async (req, res) => {
   }
   //password값이 일치할 경우 삭제
   await Comments.deleteOne({ _id: _commentId });
-  return res.json({ message: "게시글을 삭제하였습니다." });
+  return res.json({ message: "댓글을 삭제하였습니다." });
 });
 
 module.exports = router;

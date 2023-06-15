@@ -21,7 +21,7 @@ const data = [
 const Posts = require("../schemas/post.js");
 
 //게시글 목록 조회 API
-router.get("/posts", async (req, res) => {
+router.get("/", async (req, res) => {
   //보여줄 값들만 1
   const posts = await Posts.find(
     {},
@@ -39,7 +39,7 @@ router.get("/posts", async (req, res) => {
 });
 
 //게시글 상세 조회 API
-router.get("/posts/:_postId", async (req, res) => {
+router.get("/:_postId", async (req, res) => {
   const { _postId } = req.params;
 
   //보여줄 값들만 1
@@ -69,7 +69,7 @@ router.get("/posts/:_postId", async (req, res) => {
 });
 
 //게시글 생성 API
-router.post("/posts", async (req, res) => {
+router.post("/", async (req, res) => {
   //유저이름,비밀번호,제목,내용을 적음
   const { user, password, title, content } = req.body;
 
@@ -96,7 +96,7 @@ router.post("/posts", async (req, res) => {
 });
 
 //게시글 수정 API
-router.put("/posts/:_postId", async (req, res) => {
+router.put("/:_postId", async (req, res) => {
   const { _postId } = req.params;
   const { user, password, title, content } = req.body;
 
@@ -137,7 +137,7 @@ router.put("/posts/:_postId", async (req, res) => {
 });
 
 //게시글 삭제 API
-router.delete("/posts/:_postId", async (req, res) => {
+router.delete("/:_postId", async (req, res) => {
   const { _postId } = req.params;
   const { password } = req.body;
 
