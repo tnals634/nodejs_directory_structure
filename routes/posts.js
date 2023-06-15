@@ -28,16 +28,13 @@ router.get("/posts", async (req, res) => {
     { _id: 1, user: 1, title: 1, createdAt: 1 }
   );
 
-  //값들 중 _id 이름만 postId로 변경 후 값을 string으로 변환해서 보여줄 값만 넣어준다
-  const data = posts.map((post) => {
-    let postData = {};
-    postData["postId"] = String(post._id);
-    postData["user"] = post.user;
-    postData["title"] = post.title;
-    postData["createdAt"] = post.createdAt;
-    return postData;
-  });
-  console.log(data);
+  //값들 중 _id 이름만 postId로 변경
+  const data = posts.map(({ _id: postId, user, title, createdAt }) => ({
+    postId,
+    user,
+    title,
+    createdAt,
+  }));
   res.json({ data });
 });
 
@@ -52,17 +49,15 @@ router.get("/posts/:_postId", async (req, res) => {
   );
 
   //값들 중 _id 이름만 postId로 변경
-  const resultPosts = posts.map((post) => {
-    let postData = {};
-    postData["postId"] = String(post._id);
-    postData["user"] = post.user;
-    postData["title"] = post.title;
-    postData["createdAt"] = post.createdAt;
-    return postData;
-  });
+  const resultPosts = posts.map(({ _id: postId, user, title, createdAt }) => ({
+    postId,
+    user,
+    title,
+    createdAt,
+  }));
 
   //위 params로 받은 값과 저장된 값들 중 _id값이 같은게 있는지 확인
-  const [data] = resultPosts.filter((post) => post.postId === _postId);
+  const [data] = resultPosts.filter((post) => String(post.postId) === _postId);
 
   //data 값이 없으면 if문 충족
   if (!data) {
