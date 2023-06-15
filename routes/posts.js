@@ -95,7 +95,7 @@ router.post("/", async (req, res) => {
     createdAt: createDate,
   });
 
-  res.json({ message: "게시글을 생성하였습니다." });
+  res.status(201).json({ message: "게시글을 생성하였습니다." });
 });
 
 //게시글 수정 API
@@ -136,7 +136,7 @@ router.put("/:_postId", async (req, res) => {
       },
     }
   );
-  res.json({ message: "게시글을 수정하였습니다." });
+  res.status(201).json({ message: "게시글을 수정하였습니다." });
 });
 
 //게시글 삭제 API

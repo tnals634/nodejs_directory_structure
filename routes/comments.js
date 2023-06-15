@@ -86,7 +86,7 @@ router.post("/:_postId/comments", async (req, res) => {
     createdAt: date,
   });
 
-  res.json({ message: "댓글을 생성하였습니다." });
+  res.status(201).json({ message: "댓글을 생성하였습니다." });
 });
 
 //댓글 수정 API
@@ -131,7 +131,7 @@ router.put("/:_postId/comments/:_commentId", async (req, res) => {
       },
     }
   );
-  res.json({ message: "댓글을 수정하였습니다." });
+  res.status(201).json({ message: "댓글을 수정하였습니다." });
 });
 
 //댓글 삭제 API
