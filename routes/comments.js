@@ -24,31 +24,19 @@ const Posts = require("../schemas/post.js");
 router.get("/:_postId/comments", async (req, res) => {
   const { _postId } = req.params;
 
-  //보여줄 값들만 1
-  const comments = await Comments.find(
-    {},
-    { _id: 1, user: 1, content: 1, createdAt: 1, postId: 1 }
-  );
+  const comments = await Comments.find({}, { password: 0, _v: 0 });
 
-  //_postId와 comments에 저장된 postId가 있는지 확인
-  const filterComment = comments.filter((post) => post.postId === _postId);
+  const filterComment = comments.filter((value) => value.postId === _postId);
 
-  //_postId값과 일치하는게 없을 경우
-  if (!filterComment.length) {
-    return res
-      .status(400)
-      .json({ message: "데이터 형식이 올바르지 않습니다." });
-  }
+  const data = filterComment.map((value) => {
+    return {
+      commentId: value._id,
+      user: value.user,
+      content: value.content,
+      createdAt: value.createdAt,
+    };
+  });
 
-  //값들 중 _id 이름만 commentId로 변경
-  const data = filterComment.map(
-    ({ _id: commentId, user, content, createdAt }) => ({
-      commentId,
-      user,
-      content,
-      createdAt,
-    })
-  );
   res.json({ data });
 });
 
@@ -57,29 +45,18 @@ router.post("/:_postId/comments", async (req, res) => {
   const { _postId } = req.params;
   const { user, password, content } = req.body;
 
-  //댓글 생성시 해당 날짜 저장
   const date = new Date();
 
-  //보여줄 값들만 1
-  const posts = await Posts.find({}, { _id: 1 });
-
-  //입력받은 _postId값이 있는지 확인
-  const filterPost = posts.filter((id) => String(id._id) === _postId);
-
-  //body에 입력한 content값이 없을 경우
-  if (!user || !password || !filterPost.length) {
-    //body에 입력을 못했거나, filterPost값이 없을 경우
-    return res.status(400).json({
-      message: "데이터 형식이 올바르지 않습니다.",
-    });
+  if (!user || !password) {
+    return res
+      .status(400)
+      .json({ message: "데이터 형식이 올바르지 않습니다." });
   } else if (!content) {
     return res.status(400).json({ message: "댓글 내용을 입력해주세요" });
   }
 
-  //댓글이 어느 게시글의 댓글인지 구분하기위해 postId를 따로 저장
-  const id = _postId;
   await Comments.create({
-    postId: id,
+    postId: _postId,
     user,
     password,
     content,
@@ -91,74 +68,57 @@ router.post("/:_postId/comments", async (req, res) => {
 
 //댓글 수정 API
 router.put("/:_postId/comments/:_commentId", async (req, res) => {
-  const { _commentId, _postId } = req.params;
+  const { _postId, _commentId } = req.params;
   const { password, content } = req.body;
 
-  //보여줄 값들만 1
-  const comments = await Comments.find(
-    {},
-    { _id: 1, password: 1, content: 1, postId: 1 }
+  const comments = await Comments.find({ postId: _postId }, { user: 0, _v: 0 });
+
+  const filterComment = comments.filter(
+    (value) => String(value._id) === _commentId
   );
 
-  const resultPosts = comments.filter((postId) => postId.postId === _postId);
-  //값들 중 _id와 _commentId값 비교해서 같은값 넣어줌
-  const resultComments = resultPosts.filter(
-    (comment) => String(comment._id) === _commentId
-  );
-
-  //_commentId값이 없어서 resultComments값이 없을 경우
-  if (!resultComments.length) {
-    return res.status(404).json({
-      message: "댓글 조회에 실패하였습니다.",
-    });
-  } else if (!password) {
-    //입력한 값들 중 하나라도 값이 없을 경우
-    return res.status(400).json({
-      message: "데이터 형식이 올바르지 않습니다.",
-    });
+  if (!filterComment.length) {
+    return res.status(404).json({ message: "댓글 조회에 실패하였습니다." });
+  } else if (!password || password !== filterComment[0].password) {
+    return res
+      .status(400)
+      .json({ message: "데이터 형식이 올바르지 않습니다." });
   } else if (!content) {
-    //content값을 입력하지 않았을 경우
-    return res.status(400).json({ message: "댓글 내용을 입력해주세요." });
+    return res.status(400).json({ message: "댓글 내용을 입력해주세요" });
   }
 
-  // 수정한 댓글 업데이트
   await Comments.updateOne(
     { _id: _commentId },
     {
       $set: {
-        password: password,
         content: content,
       },
     }
   );
-  res.json({ message: "댓글을 수정하였습니다." });
+
+  return res.json({ message: "댓글을 수정하였습니다." });
 });
 
 //댓글 삭제 API
 router.delete("/:_postId/comments/:_commentId", async (req, res) => {
-  const { _commentId } = req.params;
+  const { _postId, _commentId } = req.params;
   const { password } = req.body;
 
-  //보여줄 값들만 1
-  const comments = await Comments.find({}, { _id: 1, password: 1 });
+  const comments = await Comments.find({ postId: _postId }, { password: 1 });
 
-  //값들 중 _id와 _commentId값 비교해서 같은값 넣어줌
-  const resultComments = comments.filter(
-    (comment) => String(comment._id) === _commentId
+  const filterComment = comments.filter(
+    (value) => String(value._id) === _commentId
   );
 
-  //_commentId값과 같은 값이 없을 경우
-  if (!resultComments.length) {
+  if (!filterComment.length) {
     return res.status(404).json({ message: "댓글 조회에 실패하였습니다." });
-  } else if (!password || password !== resultComments[0].password) {
-    //입력받아야할 password값이 없거나, 저장된 password와 같지않을 경우
+  } else if (!password || password !== filterComment[0].password) {
     return res
       .status(400)
       .json({ message: "데이터 형식이 올바르지 않습니다." });
   }
-  //password값이 일치할 경우 삭제
-  await Comments.deleteOne({ _id: _commentId });
-  return res.json({ message: "댓글을 삭제하였습니다." });
-});
 
+  await Comments.deleteOne({ _id: _commentId });
+  res.json({ message: "댓글을 삭제하였습니다." });
+});
 module.exports = router;
