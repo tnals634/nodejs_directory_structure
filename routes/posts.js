@@ -101,7 +101,7 @@ router.post("/", async (req, res) => {
 //게시글 수정 API
 router.put("/:_postId", async (req, res) => {
   const { _postId } = req.params;
-  const { user, password, title, content } = req.body;
+  const { password, title, content } = req.body;
 
   //보여줄 값들만 1
   const posts = await Posts.find(
@@ -117,7 +117,7 @@ router.put("/:_postId", async (req, res) => {
     return res.status(404).json({
       message: "게시글 조회에 실패하였습니다.",
     });
-  } else if (!user || !password || !title || !content) {
+  } else if (!password || !title || !content) {
     //입력한 값들 중 하나라도 값이 없을 경우
     return res.status(400).json({
       message: "데이터 형식이 올바르지 않습니다.",
@@ -129,7 +129,6 @@ router.put("/:_postId", async (req, res) => {
     { _id: _postId },
     {
       $set: {
-        user: user,
         password: password,
         title: title,
         content: content,
